@@ -1,63 +1,67 @@
 
 import { useState, useEffect } from 'react';
+import { toast } from "sonner";
+import { Calendar, AlarmClock, Sparkles, Star, ExternalLink } from 'lucide-react';
 import ImageGallery from '@/components/ImageGallery';
 import PropertyHeader from '@/components/PropertyHeader';
-import BookingCard from '@/components/BookingCard';
 import AmenitiesGrid from '@/components/AmenitiesGrid';
 import HostProfile from '@/components/HostProfile';
 import ReviewSection from '@/components/ReviewSection';
-import { Calendar, AlarmClock, Sparkles, Star } from 'lucide-react';
+import GoogleMap from '@/components/GoogleMap';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const AIRBNB_REDIRECT_URL = "https://www.airbnb.co.in/rooms/37898787?category_tag=Tag%3A8536&search_mode=flex_destinations_search&adults=1&check_in=2025-04-01&check_out=2025-04-06&children=0&infants=0&pets=0&photo_id=887849071&source_impression_id=p3_1743358234_P3rYzr3EsMSIxkAd&previous_page_section_name=1000&federated_search_id=f0a49464-94fd-4a35-844c-b58e86e68f84";
 
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [amenitiesDialogOpen, setAmenitiesDialogOpen] = useState(false);
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
 
   const images = [
-    "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1584738766473-61c083514bf4?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    "public/lovable-uploads/9c1a5ab7-d90c-4dca-81da-d5030808dbad.png",
+    "public/lovable-uploads/9e64ccd0-75fc-4353-89f5-e1bb5645f0a1.png",
+    "public/lovable-uploads/21cad0d9-cdc9-427d-9c7a-d90d9818b87b.png",
+    "public/lovable-uploads/97de92f1-e65e-4c42-81a8-4c52e1f33392.png",
+    "public/lovable-uploads/9754494d-7b3f-4b92-bf76-1486c3db06ea.png"
   ];
 
   const reviews = [
     {
       id: 1,
-      name: "Emma",
-      date: "October 2023",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      name: "Tarun",
+      date: "Today",
+      avatar: "public/lovable-uploads/a269abe2-842e-4672-bccf-882a689d1413.png",
       rating: 5,
-      comment: "This place is amazing! Great location and beautiful decor. The host was very communicative and helpful."
+      comment: "Great place!"
     },
     {
       id: 2,
-      name: "James",
-      date: "September 2023",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      rating: 4,
-      comment: "Very comfortable stay. The apartment is exactly as pictured. Great amenities and central location."
+      name: "Ajay",
+      date: "5 days ago",
+      avatar: "public/lovable-uploads/6a2553b7-3309-4948-abd3-6de55aa0a61c.png",
+      rating: 5,
+      comment: "The place was exactly as detailed and the pictures were a true reflection of the property."
     },
     {
       id: 3,
-      name: "Sophia",
-      date: "August 2023",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+      name: "Aniket S",
+      date: "1 week ago",
+      avatar: "public/lovable-uploads/af989ece-4c1f-4450-b4a8-d5e9c679bd07.png",
       rating: 5,
-      comment: "Perfect location! The place was clean, stylish and had everything we needed for our weekend getaway."
+      comment: "Great location, Spacious, clean and good rooms. Food is slightly on the expensive end for the taste and quantity. Overall great experience."
     },
     {
       id: 4,
-      name: "Michael",
-      date: "July 2023",
-      avatar: "https://randomuser.me/api/portraits/men/51.jpg",
+      name: "Avinash",
+      date: "2 weeks ago",
+      avatar: "public/lovable-uploads/7434d817-edbf-4b7f-a579-e0670e5588d0.png",
       rating: 5,
-      comment: "Wonderful place to stay. The host was very accommodating and the place exceeded our expectations."
+      comment: "Nicely maintained villa with excellent interiors and great hosts. The staff/host were very receptive to all requests. Pool was very well maintained. Would definitely recommend for anyone looking to stay in the area."
     }
   ];
 
@@ -71,6 +75,11 @@ Nearby attractions include Marine Drive, Juhu Beach, and several popular restaur
 
   const truncatedDescription = description.slice(0, 300) + "...";
 
+  const handleBookNow = () => {
+    window.open(AIRBNB_REDIRECT_URL, '_blank');
+    toast.success("Redirecting to Airbnb booking page");
+  };
+
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
       <PropertyHeader 
@@ -82,8 +91,8 @@ Nearby attractions include Marine Drive, Juhu Beach, and several popular restaur
       
       <ImageGallery images={images} />
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-12">
+        <div className="col-span-1">
           <div className="border-b border-gray-200 pb-6">
             <div className="flex justify-between items-start">
               <div>
@@ -112,7 +121,15 @@ Nearby attractions include Marine Drive, Juhu Beach, and several popular restaur
           </div>
           
           <div className="py-6 border-b border-gray-200 animate-fade-in">
-            <h2 className="text-lg font-bold mb-6">What this place offers</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold">What this place offers</h2>
+              <button 
+                onClick={() => setAmenitiesDialogOpen(true)}
+                className="px-6 py-2 border border-airbnb-black rounded-lg font-medium hover:bg-airbnb-lightgray transition-colors"
+              >
+                Show all amenities
+              </button>
+            </div>
             <AmenitiesGrid />
           </div>
           
@@ -128,6 +145,15 @@ Nearby attractions include Marine Drive, Juhu Beach, and several popular restaur
                 <p>1 queen bed</p>
               </div>
             </div>
+          </div>
+          
+          <div className="my-8 flex justify-center">
+            <Button 
+              className="bg-airbnb-red hover:bg-airbnb-red/90 text-white px-8 py-6 rounded-lg text-lg font-medium flex items-center gap-2"
+              onClick={handleBookNow}
+            >
+              Book on Airbnb <ExternalLink className="h-5 w-5" />
+            </Button>
           </div>
           
           <div className="py-6 border-b border-gray-200 animate-fade-in">
@@ -164,6 +190,11 @@ Nearby attractions include Marine Drive, Juhu Beach, and several popular restaur
             </div>
           </div>
           
+          <GoogleMap 
+            location="Mumbai, Maharashtra, India" 
+            redirectUrl="https://www.google.com/maps/search/?api=1&query=Mumbai+Maharashtra+India"
+          />
+          
           <HostProfile 
             name="John"
             joinDate="January 2018"
@@ -176,16 +207,101 @@ Nearby attractions include Marine Drive, Juhu Beach, and several popular restaur
             totalReviews={234}
           />
         </div>
-        
-        <div className="lg:col-span-1">
-          <BookingCard 
-            price={125}
-            rating={4.88}
-            reviews={234}
-            redirectUrl={AIRBNB_REDIRECT_URL}
-          />
-        </div>
       </div>
+      
+      <Dialog open={amenitiesDialogOpen} onOpenChange={setAmenitiesDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>What this place offers</DialogTitle>
+            <DialogDescription>
+              Here's a complete list of amenities available at this property.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 space-y-6">
+            <div>
+              <h3 className="font-medium text-lg mb-3">Scenic views</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span>Lake view</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Mountain view</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Pool view</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium text-lg mb-3">Bathroom</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span>Bath</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Hair dryer</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Cleaning products</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Shampoo</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Body soap</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Hot water</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium text-lg mb-3">Bedroom and laundry</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span>Hangers</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Bed linens</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Extra pillows and blankets</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Washer</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium text-lg mb-3">Entertainment</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span>TV</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Books and reading material</span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium text-lg mb-3">Internet and office</h3>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span>Wifi</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span>Dedicated workspace</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
