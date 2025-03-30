@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Share, Star, Heart } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 interface PropertyHeaderProps {
   title: string;
@@ -20,26 +21,35 @@ const PropertyHeader = ({ title, location, rating, reviews }: PropertyHeaderProp
   };
   
   return (
-    <div className="mb-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-airbnb-black mb-1">{title}</h1>
-      <div className="flex flex-wrap items-center justify-between">
-        <div className="flex items-center">
+    <motion.div 
+      className="mb-6"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h1 className="text-2xl md:text-3xl font-bold text-airbnb-black mb-2">{title}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-y-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <div className="flex items-center">
             <Star className="h-4 w-4 fill-current text-airbnb-red" />
             <span className="ml-1 font-medium">{rating}</span>
           </div>
-          <span className="mx-2">·</span>
-          <span className="underline font-medium">{reviews} reviews</span>
-          <span className="mx-2">·</span>
-          <span className="underline font-medium">{location}</span>
+          <span className="mx-1">·</span>
+          <span className="underline font-medium hover:text-airbnb-red transition-colors cursor-pointer">{reviews} reviews</span>
+          <span className="mx-1">·</span>
+          <span className="underline font-medium hover:text-airbnb-red transition-colors cursor-pointer">{location}</span>
         </div>
-        <div className="flex mt-2 sm:mt-0 space-x-4">
+        <div className="flex space-x-2">
           <Popover>
             <PopoverTrigger asChild>
-              <button className="flex items-center gap-2 hover:bg-gray-100 rounded-md px-3 py-1.5 transition-colors">
+              <motion.button 
+                className="flex items-center gap-2 hover:bg-gray-100 rounded-md px-3 py-1.5 transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Share className="h-4 w-4" />
                 <span className="font-medium">Share</span>
-              </button>
+              </motion.button>
             </PopoverTrigger>
             <PopoverContent className="w-72">
               <div className="space-y-2">
@@ -62,19 +72,21 @@ const PropertyHeader = ({ title, location, rating, reviews }: PropertyHeaderProp
             </PopoverContent>
           </Popover>
           
-          <button 
+          <motion.button 
             className="flex items-center gap-2 hover:bg-gray-100 rounded-md px-3 py-1.5 transition-colors"
             onClick={() => {
               setSaved(!saved);
               toast.success(saved ? "Removed from saved" : "Saved to your favorites");
             }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Heart className={`h-4 w-4 transition-colors duration-300 ${saved ? 'fill-current text-airbnb-red' : ''}`} />
             <span className="font-medium">Save</span>
-          </button>
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

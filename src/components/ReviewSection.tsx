@@ -1,14 +1,9 @@
 
 import { useState } from 'react';
-import { Star, Search, ChevronDown, Filter } from 'lucide-react';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
+import { Star, ChevronRight, Search } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Review {
   id: number;
@@ -26,179 +21,126 @@ interface ReviewSectionProps {
 }
 
 const ReviewSection = ({ rating, reviews, totalReviews }: ReviewSectionProps) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [allReviewsOpen, setAllReviewsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [visibleReviews, setVisibleReviews] = useState(4);
-
-  const loadMoreReviews = () => {
-    setVisibleReviews(prev => Math.min(prev + 4, reviews.length));
+  const [visibleReviews, setVisibleReviews] = useState(2);
+  
+  const handleShowMore = () => {
+    if (visibleReviews < reviews.length) {
+      setVisibleReviews(prev => prev + 2);
+    }
   };
-
-  const filteredReviews = reviews.filter(review => 
-    review.comment.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  
+  const filteredReviews = searchQuery 
+    ? reviews.filter(review => 
+        review.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        review.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : reviews;
 
   return (
-    <div className="my-8 animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <Star className="h-6 w-6 fill-current text-airbnb-red" />
-          <span className="ml-2 text-2xl font-bold">{rating} · {totalReviews} reviews</span>
-        </div>
-        <button 
-          onClick={() => setDialogOpen(true)}
-          className="px-4 py-2 border border-airbnb-black rounded-lg font-medium hover:bg-airbnb-lightgray transition-colors"
-        >
-          Show all reviews
-        </button>
-      </div>
-      
-      <div className="relative">
-        <div className="flex items-center gap-2 mb-6 border border-gray-300 rounded-full px-4 py-2 focus-within:border-airbnb-black transition-colors">
-          <Search className="h-4 w-4 text-gray-500" />
-          <input 
-            type="text" 
-            placeholder="Search reviews" 
-            className="flex-grow bg-transparent border-none focus:outline-none text-sm"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button 
-              className="text-sm font-medium" 
-              onClick={() => setSearchQuery('')}
-            >
-              Clear
-            </button>
-          )}
-        </div>
+    <div className="py-6 animate-fade-in">
+      <div className="flex items-center mb-6">
+        <Star className="h-6 w-6 fill-current text-airbnb-red mr-2" />
+        <span className="text-xl font-bold">{rating} · {totalReviews} reviews</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredReviews.slice(0, visibleReviews).map((review) => (
-          <div key={review.id} className="mb-6 group">
-            <div className="flex items-center mb-3">
-              <img 
-                src={review.avatar} 
-                alt={review.name} 
-                className="w-12 h-12 rounded-full mr-3 object-cover border border-gray-200 group-hover:border-airbnb-red transition-colors"
-              />
-              <div>
-                <div className="font-medium group-hover:text-airbnb-red transition-colors">{review.name}</div>
-                <div className="text-sm text-airbnb-darkgray">{review.date}</div>
+      <div className="space-y-8">
+        <AnimatePresence>
+          {reviews.slice(0, visibleReviews).map((review, index) => (
+            <motion.div 
+              key={review.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="review-card"
+            >
+              <div className="flex items-start">
+                <img 
+                  src={review.avatar} 
+                  alt={review.name} 
+                  className="w-12 h-12 rounded-full object-cover mr-4"
+                />
+                <div>
+                  <div className="font-medium">{review.name}</div>
+                  <div className="text-gray-500 text-sm">{review.date}</div>
+                </div>
               </div>
-            </div>
-            <p className="text-airbnb-black leading-relaxed">{review.comment}</p>
-          </div>
-        ))}
-      </div>
-      
-      {visibleReviews < filteredReviews.length && (
-        <button 
-          onClick={loadMoreReviews}
-          className="mt-6 px-6 py-2 border border-airbnb-black rounded-lg font-medium hover:bg-airbnb-lightgray transition-colors mx-auto block"
+              <p className="mt-3 text-gray-700">{review.comment}</p>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+        
+        {visibleReviews < reviews.length && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Button 
+              onClick={handleShowMore}
+              variant="outline"
+              className="border border-airbnb-black rounded-md hover:bg-gray-100 transition-colors"
+            >
+              Show more reviews
+            </Button>
+          </motion.div>
+        )}
+        
+        <Button 
+          onClick={() => setAllReviewsOpen(true)}
+          variant="outline"
+          className="flex items-center gap-2 border border-airbnb-black rounded-md hover:bg-gray-100 transition-colors"
         >
-          Show more reviews
-        </button>
-      )}
-      
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
+          Show all {totalReviews} reviews
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <Dialog open={allReviewsOpen} onOpenChange={setAllReviewsOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center">
-              <Star className="h-6 w-6 fill-current text-airbnb-red mr-2" />
+            <DialogTitle className="flex items-center">
+              <Star className="h-5 w-5 fill-current text-airbnb-red mr-2" />
               <span>{rating} · {totalReviews} reviews</span>
             </DialogTitle>
           </DialogHeader>
           
-          <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="col-span-1">
-              <h3 className="font-medium mb-4">Rating Breakdown</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>Cleanliness</span>
-                    <span>5.0</span>
-                  </div>
-                  <Slider value={[5]} max={5} step={0.1} disabled />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>Communication</span>
-                    <span>5.0</span>
-                  </div>
-                  <Slider value={[5]} max={5} step={0.1} disabled />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>Check-in</span>
-                    <span>5.0</span>
-                  </div>
-                  <Slider value={[5]} max={5} step={0.1} disabled />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>Accuracy</span>
-                    <span>5.0</span>
-                  </div>
-                  <Slider value={[5]} max={5} step={0.1} disabled />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>Location</span>
-                    <span>5.0</span>
-                  </div>
-                  <Slider value={[5]} max={5} step={0.1} disabled />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>Value</span>
-                    <span>4.7</span>
-                  </div>
-                  <Slider value={[4.7]} max={5} step={0.1} disabled />
-                </div>
-              </div>
+          <div className="mt-4">
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search reviews"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-airbnb-red focus:border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             
-            <div className="col-span-1 lg:col-span-2">
-              <div className="flex items-center gap-2 mb-6 border border-gray-300 rounded-full px-4 py-2 focus-within:border-airbnb-black transition-colors">
-                <Search className="h-4 w-4 text-gray-500" />
-                <input 
-                  type="text" 
-                  placeholder="Search reviews" 
-                  className="flex-grow bg-transparent border-none focus:outline-none text-sm"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery && (
-                  <button 
-                    className="text-sm font-medium" 
-                    onClick={() => setSearchQuery('')}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredReviews.map((review) => (
-                  <div key={review.id} className="mb-6 group p-4 border border-transparent hover:border-gray-200 rounded-xl transition-colors">
-                    <div className="flex items-center mb-3">
+            <div className="space-y-6">
+              {filteredReviews.length > 0 ? (
+                filteredReviews.map((review) => (
+                  <div key={review.id} className="pb-6 border-b border-gray-200 last:border-b-0">
+                    <div className="flex items-start">
                       <img 
                         src={review.avatar} 
                         alt={review.name} 
-                        className="w-12 h-12 rounded-full mr-3 object-cover border border-gray-200 group-hover:border-airbnb-red transition-colors"
+                        className="w-12 h-12 rounded-full object-cover mr-4"
                       />
                       <div>
-                        <div className="font-medium group-hover:text-airbnb-red transition-colors">{review.name}</div>
-                        <div className="text-sm text-airbnb-darkgray">{review.date}</div>
+                        <div className="font-medium">{review.name}</div>
+                        <div className="text-gray-500 text-sm">{review.date}</div>
                       </div>
                     </div>
-                    <p className="text-airbnb-black leading-relaxed">{review.comment}</p>
+                    <p className="mt-3 text-gray-700">{review.comment}</p>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  No reviews match your search.
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
