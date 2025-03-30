@@ -1,5 +1,7 @@
 
+import { useState } from 'react';
 import { Shield, Award, Star } from 'lucide-react';
+import PropertyDialog from './PropertyDialog';
 
 interface HostProfileProps {
   name: string;
@@ -8,6 +10,8 @@ interface HostProfileProps {
 }
 
 const HostProfile = ({ name, joinDate, image }: HostProfileProps) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   return (
     <div className="my-8 pb-6 border-b border-gray-200 animate-fade-in">
       <div className="flex items-start justify-between">
@@ -33,12 +37,33 @@ const HostProfile = ({ name, joinDate, image }: HostProfileProps) => {
         </div>
       </div>
       
+      <div className="mt-8 space-y-5">
+        <h3 className="text-lg font-bold">Things to know</h3>
+        
+        <div className="space-y-2">
+          <h4 className="font-medium">House rules</h4>
+          <ul className="space-y-2">
+            <li>Check-in after 2:00pm</li> 
+            <li>Checkout before 11:00am</li>
+            <li>Pets allowed</li>
+          </ul>
+          <button 
+            onClick={() => setDialogOpen(true)}
+            className="mt-2 text-airbnb-black font-medium underline hover:text-airbnb-red transition-colors"
+          >
+            Show more
+          </button>
+        </div>
+      </div>
+      
       <div className="mt-6">
         <p className="mb-4">Fast responses. Usually responds within minutes.</p>
         <button className="px-6 py-2 border border-airbnb-black rounded-lg font-medium hover:bg-airbnb-lightgray transition-colors">
           Contact host
         </button>
       </div>
+      
+      <PropertyDialog open={dialogOpen} setOpen={setDialogOpen} />
     </div>
   );
 };
